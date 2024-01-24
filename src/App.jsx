@@ -9,6 +9,7 @@ function App() {
       let[newTodo,setNewTodo]=useState("")
       let [filteredTodo, setFilteredTodo]=useState(todo); 
       let [page,setPage]=useState(0);
+      let[loading,setLoading]=useState(false);
 
 
       let  createTodo=async()=>{
@@ -29,12 +30,14 @@ function App() {
 
       let getTodoItems= async ()=>{
         try {
-          
+           setLoading(true);
           let res=await AxiosService.get('/todo/get'); 
             setTodo(res.data.getAllTodo)  
         } catch (error) {
           console.log(error);
           toast.error(error.response.data.message || "Error Occured")
+        }finally{
+             setLoading(false);
         }
       }
 
@@ -114,26 +117,33 @@ function App() {
               <div className='row d-flex justify-content-center mt-3'>
 
                     <div className='col-lg-6  col-md-8 col-9  list-item todoitem '>
-                        <ul>
-                              <h4>My Todo's....</h4>
-                              <hr /> 
-                              { filteredTodo.length==0? (
-                                  <p>No Todo's found</p>
-                              ):(
-                                filteredTodo.map((e)=>{
-                                  return <li className={e.status?'strikeout':' '} key={e._id}>
-                                            <div className='listelements'>
-                                                <input type="checkbox" className='form-check-input mx-3'  onChange={()=>handleCheckBox(e._id)}   checked={e.status}/>
-                                                <span>{e.todo}</span>
-                                                <IoMdClose className='delete-icon ' size={28} color="#063308ad"  onClick={()=>handleDelete(e._id)} />
-                                            </div>
-                                            <hr /> 
-                                      </li>
+                       {
+                          loading ? (
+                              <div className='loader'> Loading...</div>
+                          ):(
 
-                              })
-                              )  
-                              }
-                        </ul>
+                          <ul>
+                            <h4>My Todo's....</h4>
+                            <hr /> 
+                            { filteredTodo.length==0? (
+                                <p>No Todo's found</p>
+                            ):(
+                              filteredTodo.map((e)=>{
+                                return <li className={e.status?'strikeout':' '} key={e._id}>
+                                          <div className='listelements'>
+                                              <input type="checkbox" className='form-check-input mx-3'  onChange={()=>handleCheckBox(e._id)}   checked={e.status}/>
+                                              <span>{e.todo}</span>
+                                              <IoMdClose className='delete-icon ' size={28} color="#063308ad"  onClick={()=>handleDelete(e._id)} />
+                                          </div>
+                                          <hr /> 
+                                    </li>
+
+                            })
+                            )  
+                            }
+                      </ul>
+                      )
+                       } 
                     </div> 
                     
               </div>
